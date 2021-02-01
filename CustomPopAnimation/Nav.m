@@ -29,6 +29,7 @@
     
     UIPanGestureRecognizer *popRecognizer = [[UIPanGestureRecognizer alloc] init];
     popRecognizer.delegate = self;
+    popRecognizer.maximumNumberOfTouches = 1;
 //    popRecognizer.delegate = gesture.delegate; // 可能卡死
     [gestureView addGestureRecognizer:popRecognizer];
     

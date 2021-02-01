@@ -8,6 +8,7 @@
 
 #import "Nav.h"
 #import "NavigationInteractiveTransition.h"
+#import <objc/message.h>
 
 @interface Nav () <UIGestureRecognizerDelegate>
 @property (nonatomic, weak) UIPanGestureRecognizer *popRecognizer;
@@ -28,7 +29,7 @@
     
     UIPanGestureRecognizer *popRecognizer = [[UIPanGestureRecognizer alloc] init];
     popRecognizer.delegate = self;
-    popRecognizer.maximumNumberOfTouches = 1;
+//    popRecognizer.delegate = gesture.delegate; // 可能卡死
     [gestureView addGestureRecognizer:popRecognizer];
     
 #if USE_方案一
@@ -44,6 +45,9 @@
      *  获取它的唯一对象，我们知道它是一个叫UIGestureRecognizerTarget的私有类，它有一个属性叫_target
      */
     id gestureRecognizerTarget = [_targets firstObject];
+    
+    // https://github.com/nst/iOS-Runtime-Headers/blob/master/PrivateFrameworks/UIKitCore.framework/UIGestureRecognizerTarget.h
+    
     /**
      *  获取_target:_UINavigationInteractiveTransition，它有一个方法叫handleNavigationTransition:
      */
@@ -51,7 +55,7 @@
     /**
      *  通过前面的打印，我们从控制台获取出来它的方法签名。
      */
-    SEL handleTransition = NSSelectorFromString(@"handleNavigationTransition:");
+    SEL handleTransition = ((SEL (*)(id, SEL))(void *) objc_msgSend)(gestureRecognizerTarget, @selector(action));
     /**
      *  创建一个与系统一模一样的手势，我们只把它的类改为UIPanGestureRecognizer
      */
